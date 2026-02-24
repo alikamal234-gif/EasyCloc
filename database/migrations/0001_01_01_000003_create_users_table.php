@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->integer('reputation_score')->default(0);
             $table->boolean('is_banned')->default(false);
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();
         });
