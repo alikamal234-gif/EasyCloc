@@ -66,4 +66,8 @@ class User extends Authenticatable
         ->withPivot('joined_at','internal_role','left_at')
         ->withTimestamps();
     }
+
+    public function isAdmin(){
+        return $this->role && $this->role->name == 'admin';
+    }
 }
