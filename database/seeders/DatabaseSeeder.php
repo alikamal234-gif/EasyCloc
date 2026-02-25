@@ -2,6 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
+use App\Models\Expense;
+use App\Models\Flatshare;
+use App\Models\Invitation;
+use App\Models\Payment;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,7 +21,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Role::factory()->create([
+            'name' => 'admin'
+        ]);
+        Role::factory()->create([
+            'name' => 'user'
+        ]);
+        User::factory(50)->create();
+        Flatshare::factory(50)->create();
+        Category::factory(50)->create();
+        Expense::factory(50)->create();
+        Invitation::factory(50)->create();
+        Payment::factory(50)->create();
 
         User::factory()->create([
             'name' => 'Test User',

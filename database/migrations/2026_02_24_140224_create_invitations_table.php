@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->string('token')->unique();
-            $table->enum('status',['accès','refus']);
+            $table->enum('status',['pending','accepted','refused']);
             $table->foreignId('flatshare_id')->constrained('flatshares')->cascadeOnDelete();
             $table->timestamps();
         });
