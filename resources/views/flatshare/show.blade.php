@@ -47,7 +47,10 @@
                             @csrf
                             @method('PUT')
 
-                            <button type="submit"
+                            <button type="submit"  
+                                @if($members > 1)
+                                    disabled
+                                @endif
                                 class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                                 Cancel
                             </button>

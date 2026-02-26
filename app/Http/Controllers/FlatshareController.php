@@ -64,8 +64,10 @@ class FlatshareController extends Controller
         if (! $flatshare->users->contains(auth()->id())) {
             abort(403);
         }
+          $members = $flatshare->users()->count();
+       
 
-        return view('flatshare.show', compact('flatshare'));
+        return view('flatshare.show', compact('flatshare','members'));
     }
 
     /**
@@ -114,7 +116,10 @@ class FlatshareController extends Controller
         ) {
             abort(403);
         }
-
+      
+        if($flatshare->users()->count() > 1){
+            return abort(404);
+        }
         $flatshare->update([
             'status' => 'cancelled',
         ]);

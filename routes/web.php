@@ -3,6 +3,7 @@
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FlatshareController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/flatshare/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('expense.edit');
     Route::put('/flatshare/expense/update/{id}', [ExpenseController::class, 'update'])->name('expense.update');
     Route::get('/flatshare/expense/credit/{id}', [CreditController::class, 'show'])->name('expense.credit');
+    
+    Route::post('/flatshare/expense/credit/payment', [PaymentController::class, 'market'])->name('payment.market');
 
 
 });

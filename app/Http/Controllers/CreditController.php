@@ -19,88 +19,77 @@ class CreditController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-{
-    $flatshare = Flatshare::with(['users', 'expenses.user'])
-        ->findOrFail($id);
+    {
+        $flatshare = Flatshare::with([
+            'users',
+            'expenses.user',
+            'payments',
+        ])->findOrFail($id);
 
-    $total = $flatshare->expenses->sum('amount');
-    $membersCount = $flatshare->users->count();
-    $share = $membersCount > 0 ? $total / $membersCount : 0;
+        $total = $flatshare->expenses->sum('amount');
+        $membersCount = $flatshare->users->count();
+        $share = $membersCount > 0 ? $total / $membersCount : 0;
 
-    $balances = [];
+        $balances = [];
 
-    foreach ($flatshare->users as $user) {
+        foreach ($flatshare->users as $user) {
 
-        $paid = $flatshare->expenses
-            ->where('user_id', $user->id)
-            ->sum('amount');
+            $paidExpenses = $flatshare->expenses
+                ->where('user_id', $user->id)
+                ->sum('amount');
 
-        $balances[] = [
-            'user' => $user,
-            'balance' => round($paid - $share, 2),
-        ];
-    }
+            $received = $flatshare->payments
+                ->where('creditor_id', $user->id)
+                ->sum('amount');
 
-    $creditors = collect($balances)->where('balance', '>', 0);
-    $debtors   = collect($balances)->where('balance', '<', 0);
+            $given = $flatshare->payments
+                ->where('debtor_id', $user->id)
+                ->sum('amount');
 
-    $settlements = [];
+            $balance = $paidExpenses - $share + $received - $given;
 
-    foreach ($debtors as $debtor) {
-
-        $remainingDebt = abs($debtor['balance']);
-
-        foreach ($creditors as $creditor) {
-
-            if ($remainingDebt <= 0) {
-                break;
-            }
-
-            if ($creditor['balance'] <= 0) {
-                continue;
-            }
-
-            $amount = min($remainingDebt, $creditor['balance']);
-
-            $settlements[] = [
-                'from' => $debtor['user'],
-                'to'   => $creditor['user'],
-                'amount' => round($amount, 2),
+            $balances[] = [
+                'user' => $user,
+                'balance' => round($balance, 2),
             ];
-
-            $remainingDebt -= $amount;
         }
-    }
 
-    return view('flatshare.credit', compact(
-        'flatshare',
-        'settlements',
-        'total',
-        'share'
-    ));
-}
+        $creditors = collect($balances)->where('balance', '>', 0);
+        $debtors = collect($balances)->where('balance', '<', 0);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $settlements = [];
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        foreach ($debtors as $debtor) {
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            $remainingDebt = abs($debtor['balance']);
+
+            foreach ($creditors as $creditor) {
+
+                if ($remainingDebt <= 0) {
+                    break;
+                }
+                if ($creditor['balance'] <= 0) {
+                    continue;
+                }
+
+                $amount = min($remainingDebt, $creditor['balance']);
+
+                $settlements[] = [
+                    'from' => $debtor['user'],
+                    'to' => $creditor['user'],
+                    'amount' => round($amount, 2),
+                ];
+
+                $remainingDebt -= $amount;
+            }
+        }
+
+        return view('flatshare.credit', compact(
+            'flatshare',
+            'settlements',
+            'total',
+            'share'
+        ));
     }
+   
 }

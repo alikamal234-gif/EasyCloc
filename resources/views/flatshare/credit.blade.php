@@ -73,13 +73,21 @@
 
                     <div class="text-red-600 font-bold text-xl">
                         {{ number_format($settlement['amount'],2) }} DH
-                        <form action="" method="POST">
+                        @if ($settlement['to']->name == Auth()->user()->name)
+                            <form action="{{ route('payment.market') }}" method="POST">
                                @csrf
+                               <input type="text" name="amount" id="" class="hidden" value="{{ $settlement['amount'] }}">
+                               <input type="text" name="debtor_id" id="" class="hidden" value="{{ Auth()->id() }}">
+                               <input type="text" name="creditor_id" id="" class="hidden" value="{{ $settlement['from']->id }}">
+                               <input type="text" name="flatshare_id" id="" class="hidden" value="{{ $flatshare->id }}">
                                <button type="submit"
                                    class="bg-green-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 shadow">
                                    Mark as Paid
                                </button>
                            </form>
+                        @else
+                           <h5 class="text-black">is not paid</h5>
+                        @endif
                     </div>
 
                 </div>
