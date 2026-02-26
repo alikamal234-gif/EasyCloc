@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FlatshareController;
 use App\Http\Controllers\ProfileController;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/flatshare/expense/store/{id}', [ExpenseController::class, 'store'])->name('expense.store');
     Route::get('/flatshare/expense/edit/{id}', [ExpenseController::class, 'edit'])->name('expense.edit');
     Route::put('/flatshare/expense/update/{id}', [ExpenseController::class, 'update'])->name('expense.update');
+    Route::get('/flatshare/expense/credit/{id}', [CreditController::class, 'show'])->name('expense.credit');
 
 
 });

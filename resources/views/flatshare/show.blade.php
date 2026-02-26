@@ -43,11 +43,12 @@
                     @endphp
 
                     @if($pivot && $pivot->internal_role === 'owner')
-                       <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
+                        <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
-                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+                            <button type="submit"
+                                class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                                 Cancel
                             </button>
                         </form>
@@ -56,7 +57,8 @@
                             @csrf
                             @method('PUT')
 
-                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+                            <button type="submit"
+                                class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                                 Exit
                             </button>
                         </form>
@@ -101,74 +103,118 @@
         </div>
 
         <!-- Expenses Section -->
-<div class="bg-white p-6 rounded-xl shadow">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-lg font-semibold text-gray-800">
-            Expenses
-        </h2>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    Expenses
+                </h2>
 
-        @if($flatshare->status === 'active')
-            <a href="{{ route('expense.create', $flatshare->id) }}"
-               class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-                + Add Expense
-            </a>
-        @endif
-    </div>
-
-    @php
-        $total = $flatshare->expenses->sum('amount');
-    @endphp
-
-    <!-- Total -->
-    <div class="mb-4 text-sm text-gray-600">
-        Total Expenses:
-        <span class="font-semibold text-blue-600">
-            {{ $total }} DH
-        </span>
-    </div>
-
-    <!-- Expenses List -->
-    <div class="space-y-4">
-
-        @forelse($flatshare->expenses as $expense)
-
-            <div class="border rounded-lg p-4 flex justify-between items-center">
-
-                <div>
-                    <p class="font-medium text-gray-800">
-                        {{ $expense->title }}
-                    </p>
-
-                    <p class="text-sm text-gray-500">
-                        Paid by: {{ $expense->user->name }}
-                    </p>
-
-                    <p class="text-xs text-gray-400">
-                        {{ $expense->date }}
-                    </p>
-                </div>
-
-                <div class="text-right">
-                    <p class="font-semibold text-blue-600">
-                        {{ $expense->amount }} DH
-                    </p>
-
-                    <p class="text-xs text-gray-400">
-                        {{ $expense->category->name ?? 'No Category' }}
-                    </p>
-                </div>
-                <a href="{{ route('expense.edit',$expense->id) }}">edit</a>
-
+                @if($flatshare->status === 'active')
+                    <a href="{{ route('expense.create', $flatshare->id) }}"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+                        + Add Expense
+                    </a>
+                    <a href="{{ route('expense.credit', $flatshare->id) }}"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+                        creadit
+                    </a>
+                @endif
             </div>
 
-        @empty
-            <div class="text-gray-500 text-sm text-center py-6">
-                No expenses added yet.
-            </div>
-        @endforelse
+            @php
+                $total = $flatshare->expenses->sum('amount');
+            @endphp
 
-    </div>
-</div>
+            <!-- Total -->
+            <div class="mb-4 text-sm text-gray-600">
+                Total Expenses:
+                <span class="font-semibold text-blue-600">
+                    {{ $total }} DH
+                </span>
+            </div>
+            @php
+                $membersSummary = [];
+
+                foreach ($flatshare->users as $member) {
+                    $paid = $flatshare->expenses
+                        ->where('user_id', $member->id)
+                        ->sum('amount');
+
+                    $membersSummary[] = [
+                        'name' => $member->name,
+                        'paid' => $paid
+                    ];
+                }
+            @endphp
+
+            <!-- Members Contribution -->
+            <div class="mb-6">
+                <h3 class="text-md font-semibold text-gray-800 mb-3">
+                    Members Contribution
+                </h3>
+
+                <div class="grid md:grid-cols-2 gap-4">
+
+                    @foreach($membersSummary as $member)
+
+                        <div class="bg-gray-50 border rounded-lg p-4 flex justify-between items-center">
+
+                            <span class="text-gray-700 font-medium">
+                                {{ $member['name'] }}
+                            </span>
+
+                            <span class="text-blue-600 font-semibold">
+                                {{ $member['paid'] }} DH
+                            </span>
+
+                        </div>
+
+                    @endforeach
+
+                </div>
+            </div>
+            <!-- Expenses List -->
+            <div class="space-y-4">
+
+                @forelse($flatshare->expenses as $expense)
+
+                    <div class="border rounded-lg p-4 flex justify-between items-center">
+
+                        <div>
+                            <p class="font-medium text-gray-800">
+                                {{ $expense->title }}
+                            </p>
+
+                            <p class="text-sm text-gray-500">
+                                Paid by: {{ $expense->user->name }}
+                            </p>
+
+                            <p class="text-xs text-gray-400">
+                                {{ $expense->date }}
+                            </p>
+                        </div>
+
+                        <div class="text-right">
+                            <p class="font-semibold text-blue-600">
+                                {{ $expense->amount }} DH
+                            </p>
+
+                            <p class="text-xs text-gray-400">
+                                {{ $expense->category->name ?? 'No Category' }}
+                            </p>
+                        </div>
+                        <a href="{{ route('expense.edit', $expense->id) }}">edit</a>
+                       
+                    </div>
+
+                @empty
+                    <div class="text-gray-500 text-sm text-center py-6">
+                        No expenses added yet.
+                    </div>
+                @endforelse
+
+            </div>
+        </div>
 
     </div>
 

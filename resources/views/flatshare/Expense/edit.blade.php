@@ -21,7 +21,6 @@
         @csrf
         @method('PUT')
 
-        <!-- Title -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 Title
@@ -33,7 +32,6 @@
                    required>
         </div>
 
-        <!-- Amount -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 Amount (DH)
@@ -46,19 +44,17 @@
                    required>
         </div>
 
-        <!-- Date -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 Date
             </label>
             <input type="date"
                    name="date"
-                   value="{{ old('date', $expense->date) }}"
+                   value="{{ old('date', \Carbon\Carbon::parse($expense->date)->format('Y-m-d')) }}"
                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                    required>
         </div>
 
-        <!-- Category -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
                 Category
@@ -67,17 +63,13 @@
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                     required>
 
-                @foreach($expense->flatshare->categories as $category)
-                    <option value="{{ $category->id }}"
-                        {{ $expense->category->id == $category->id ? 'selected' : '' }}>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
+               @foreach ($expense->flatshare->categories as $category)
+                   <option value="{{ $category->id }}" {{ $category->id == $expense->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
+               @endforeach
 
             </select>
         </div>
 
-        <!-- Buttons -->
         <div class="flex justify-between items-center">
 
             <a href="{{ route('flatshare.show', $expense->flatshare_id) }}"
