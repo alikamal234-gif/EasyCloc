@@ -48,6 +48,12 @@ class LoginRequest extends FormRequest
                 'email' => trans('auth.failed'),
             ]);
         }
+        if(Auth::user()->is_banned){
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email','your account is banned'
+            ]);
+        }
 
         RateLimiter::clear($this->throttleKey());
     }

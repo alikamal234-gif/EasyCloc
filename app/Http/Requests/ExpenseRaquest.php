@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FlatshareRequest extends FormRequest
+class ExpenseRaquest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,10 @@ class FlatshareRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required','min:1','string'],
-            'description' => ['string'],
-            'status' => ['string']
+            'title' => ['string','required'],
+            'amount' => ['integer','required','min:0'],
+            'date' => ['date','required'],
+            'category_id' => ['exists:categories,id']
         ];
     }
 }

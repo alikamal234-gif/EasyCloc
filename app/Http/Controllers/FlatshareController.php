@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\FlatshareRequest;
 use App\Models\Flatshare;
-use Illuminate\Http\Request;
+use DB;
 
 class FlatshareController extends Controller
 {
@@ -14,8 +14,16 @@ class FlatshareController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $flatshares = $user->flatshares();
-        return view('flatshare.index',compact('flatshares'));
+        $flatshares = $user->flatshares;
+        $is_can = true;
+        foreach ($user->flatshares as $flatshare) {
+            if ($flatshare->status == 'active') {
+                $is_can = false;
+
+            }
+        }
+
+        return view('flatshare.index', compact('flatshares', 'is_can'));
     }
 
     /**
@@ -23,6 +31,7 @@ class FlatshareController extends Controller
      */
     public function create()
     {
+
         return view('flatshare.create');
     }
 
@@ -31,8 +40,17 @@ class FlatshareController extends Controller
      */
     public function store(FlatshareRequest $request)
     {
+
         $data = $request->validated();
-        Flatshare::create($data);
+
+        DB::transaction(function () use ($data) {
+            $flatshare = Flatshare::create($data);
+            $flatshare->users()->attach(auth()->id(), [
+                'internal_role' => 'owner',
+                'joined_at' => now(),
+            ]);
+        });
+
         return redirect()->route('flatshare.index');
     }
 
@@ -41,8 +59,13 @@ class FlatshareController extends Controller
      */
     public function show(string $id)
     {
-        $flatshare = Flatshare::find($id);
-        return view('flatshare.show',compact('flatshare'));
+        $flatshare = Flatshare::with(['expenses.user', 'expenses.category'])
+            ->findOrFail($id);
+        if (! $flatshare->users->contains(auth()->id())) {
+            abort(403);
+        }
+
+        return view('flatshare.show', compact('flatshare'));
     }
 
     /**
@@ -51,7 +74,8 @@ class FlatshareController extends Controller
     public function edit(string $id)
     {
         $flatshare = Flatshare::find($id);
-        return view('flatshare.edit',compact('flatshare'));
+
+        return view('flatshare.edit', compact('flatshare'));
     }
 
     /**
@@ -62,6 +86,7 @@ class FlatshareController extends Controller
         $flatshare = Flatshare::find($id);
         $data = $request->validated();
         $flatshare->update($data);
+
         return redirect()->route('flatshare.index');
     }
 
@@ -70,8 +95,30 @@ class FlatshareController extends Controller
      */
     public function destroy(string $id)
     {
-        $flatshare = Flatshare::find($id);
+        $flatshare = Flatshare::findOrFail($id);
+
         $flatshare->delete();
+
+        return redirect()->route('flatshare.index');
+    }
+
+    public function cancel(string $id)
+    {
+        $flatshare = Flatshare::findOrFail($id);
+
+        if (
+            $flatshare->users()
+                ->where('user_id', auth()->id())
+                ->wherePivot('internal_role', 'owner')
+                ->doesntExist()
+        ) {
+            abort(403);
+        }
+
+        $flatshare->update([
+            'status' => 'cancelled',
+        ]);
+
         return redirect()->route('flatshare.index');
     }
 }
