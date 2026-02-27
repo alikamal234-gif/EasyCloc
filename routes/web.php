@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FlatshareController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -47,6 +48,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/flatshare/{flatshareId}/categories', [CategoryController::class, 'create'])->name('category.create');
     Route::post('/flatshare/{flatshareId}/categories/store', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('/flatshare/{flatshareId}/invitation/create', [InvitationController::class, 'create'])->name('flatshare.invite');
+    Route::post('/flatshare/invitation/store', [InvitationController::class, 'send'])->name('flatshare.invite.store');
+    Route::get('/flatshare/invitation/{token}', [InvitationController::class, 'process'])->name('flatshare.process');
+    
+    
+    Route::put('/flatshare/invitation/{token}/accept', [InvitationController::class, 'accept'])->name('flatshare.process.accept');
+    Route::put('/flatshare/invitation/{token}/refused', [InvitationController::class, 'refuse'])->name('flatshare.process.refuse');
 
 });
 

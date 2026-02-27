@@ -64,6 +64,10 @@
                                 class="text-yellow-600 hover:underline text-sm">
                                 Edit
                             </a>
+                            <a href="{{ route('flatshare.invite', $flatshare->id) }}"
+                                class="text-yellow-600 hover:underline text-sm">
+                                Invite
+                            </a>
 
                             <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
                                 @csrf
