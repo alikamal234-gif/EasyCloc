@@ -21,7 +21,9 @@ class CreditController extends Controller
     public function show(string $id)
     {
         $flatshare = Flatshare::with([
-            'users',
+            'users' => function ($query) {
+                $query->wherePivotNull('left_at');
+            },
             'expenses.user',
             'payments',
         ])->findOrFail($id);
@@ -91,5 +93,4 @@ class CreditController extends Controller
             'share'
         ));
     }
-   
 }

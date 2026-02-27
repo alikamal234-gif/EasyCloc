@@ -12,6 +12,11 @@
 
     <div class="max-w-5xl mx-auto py-10 px-4">
 
+            @error('success')
+                        <p class="text-green-500 text-sm mt-1">
+                            {{ $message }}
+                        </p>
+                    @enderror
         <!-- Header -->
         <div class="bg-white p-6 rounded-xl shadow mb-8">
             <div class="flex justify-between items-start">
@@ -47,14 +52,12 @@
                             @csrf
                             @method('PUT')
 
-                            <button type="submit"  
-                                @if($members > 1)
-                                    disabled
-                                @endif
+                            <button type="submit" @if($members > 1) disabled @endif
                                 class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                                 Cancel
                             </button>
                         </form>
+                        <a href="{{ route('category.create',$flatshare->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">Add Category</a>
                     @else
                         <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
                             @csrf
@@ -80,27 +83,49 @@
 
             <div class="space-y-3">
                 @foreach($flatshare->users as $user)
-                    <div class="flex justify-between items-center border-b pb-2">
+                    @if ($user->pivot->left_at == NULL)
 
-                        <div>
-                            <p class="font-medium text-gray-700">
-                                {{ $user->name }}
-                            </p>
-                            <span class="text-sm text-gray-500">
-                                {{ ucfirst($user->pivot->internal_role) }}
-                            </span>
+
+                        <div class="flex justify-between items-center border-b pb-2">
+
+                            <div>
+                                <p class="font-medium text-gray-700">
+                                    {{ $user->name }}
+                                    @if ($user->name == Auth()->user()->name)
+                                    <span class="inline-block mt-3 px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
+                                        You
+                                    </span>
+                                @endif
+                                </p>
+                                <span class="text-sm text-gray-500">
+                                    {{ ucfirst($user->pivot->internal_role) }}
+                                </span>
+                            </div>
+
+                            @if(
+                                    $pivot && $pivot->internal_role === 'owner'
+                                    && $user->id !== auth()->id()
+                                )
+                                <div>
+                                    <form action="{{ route('passer.role', [$flatshare->id, $user->id]) }}" method="post">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="text-blue-600 text-sm hover:underline">
+                                            Make Owner
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('remove.member', [$flatshare->id, $user->id]) }}" method="post">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="text-red-600 text-sm hover:underline">
+                                            Remove member
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+
                         </div>
-
-                        @if(
-                                $pivot && $pivot->internal_role === 'owner'
-                                && $user->id !== auth()->id()
-                            )
-                            <button class="text-blue-600 text-sm hover:underline">
-                                Make Owner
-                            </button>
-                        @endif
-
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -160,10 +185,11 @@
 
                     @foreach($membersSummary as $member)
 
-                        <div class="bg-gray-50 border rounded-lg p-4 flex justify-between items-center">
+                        <div class="bg-gray-50 border rounded-lg p-4 flex justify-between items-center @if ($member['name'] == Auth()->user()->name) bg-green-100 text-green-700 @endif">
 
-                            <span class="text-gray-700 font-medium">
+                            <span class="text-gray-700 font-medium ">
                                 {{ $member['name'] }}
+                               
                             </span>
 
                             <span class="text-blue-600 font-semibold">
@@ -190,6 +216,11 @@
 
                             <p class="text-sm text-gray-500">
                                 Paid by: {{ $expense->user->name }}
+                                @if ($expense->user->id == Auth()->id())
+                                    <span class="inline-block mt-3 px-3 py-1 text-sm rounded-full bg-green-100 text-green-700">
+                                        You
+                                    </span>
+                                @endif
                             </p>
 
                             <p class="text-xs text-gray-400">
@@ -206,8 +237,10 @@
                                 {{ $expense->category->name ?? 'No Category' }}
                             </p>
                         </div>
-                        <a href="{{ route('expense.edit', $expense->id) }}">edit</a>
-                       
+                        @if ($expense->user->id == Auth()->id())
+                            <a href="{{ route('expense.edit', $expense->id) }}">edit</a>
+                        @endif
+
                     </div>
 
                 @empty

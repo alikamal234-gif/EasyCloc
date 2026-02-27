@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\FlatshareRequest;
 use App\Models\Flatshare;
+use App\Models\User;
 use DB;
 
 class FlatshareController extends Controller
@@ -126,4 +127,7 @@ class FlatshareController extends Controller
 
         return redirect()->route('flatshare.index');
     }
+
+    
+    
 }

@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FlatshareController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/flatshare/expense/credit/{id}', [CreditController::class, 'show'])->name('expense.credit');
     
     Route::post('/flatshare/expense/credit/payment', [PaymentController::class, 'market'])->name('payment.market');
+    Route::put('/flatshare/{flatshareId}/role/{newOwnerId}', [OwnerController::class, 'internalRole'])->name('passer.role');
+    Route::put('/flatshare/{flatshareId}/member{newOwnerId}/remove', [OwnerController::class, 'remove'])->name('remove.member');
 
+    Route::get('/flatshare/{flatshareId}/categories', [CategoryController::class, 'create'])->name('category.create');
+    Route::post('/flatshare/{flatshareId}/categories/store', [CategoryController::class, 'store'])->name('category.store');
 
 });
 
