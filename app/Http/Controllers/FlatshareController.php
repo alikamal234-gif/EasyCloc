@@ -16,7 +16,7 @@ class FlatshareController extends Controller
         $user = auth()->user();
         $flatshares = $user->flatshares()->wherePivotNull('left_at')->get();
         $is_can = true;
-        foreach ($user->flatshares as $flatshare) {
+        foreach ($flatshares as $flatshare) {
             if ($flatshare->status == 'active') {
                 $is_can = false;
             }
@@ -63,8 +63,7 @@ class FlatshareController extends Controller
         if (! $flatshare->users->contains(auth()->id())) {
             abort(403);
         }
-        $members = $flatshare->users()->count();
-
+        $members = $flatshare->users()->get();
         return view('flatshare.show', compact('flatshare', 'members'));
     }
 
