@@ -57,18 +57,17 @@
                                 Cancel
                             </button>
                         </form>
-                        <a href="{{ route('category.create',$flatshare->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">Add Category</a>
-                    @else
-                        <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
+                        @else
+                        <form action="{{ route('flatshare.exit', $flatshare->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-
                             <button type="submit"
-                                class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-                                Exit
-                            </button>
-                        </form>
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+                            Exit
+                        </button>
+                    </form>
                     @endif
+                    <a href="{{ route('category.create',$flatshare->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">Add Category</a>
 
                 </div>
 
@@ -160,48 +159,7 @@
                     {{ $total }} DH
                 </span>
             </div>
-            @php
-                $membersSummary = [];
-
-                foreach ($flatshare->users as $member) {
-                    $paid = $flatshare->expenses
-                        ->where('user_id', $member->id)
-                        ->sum('amount');
-
-                    $membersSummary[] = [
-                        'name' => $member->name,
-                        'paid' => $paid
-                    ];
-                }
-            @endphp
-
-            <!-- Members Contribution -->
-            <div class="mb-6">
-                <h3 class="text-md font-semibold text-gray-800 mb-3">
-                    Members Contribution
-                </h3>
-
-                <div class="grid md:grid-cols-2 gap-4">
-
-                    @foreach($membersSummary as $member)
-
-                        <div class="bg-gray-50 border rounded-lg p-4 flex justify-between items-center @if ($member['name'] == Auth()->user()->name) bg-green-100 text-green-700 @endif">
-
-                            <span class="text-gray-700 font-medium ">
-                                {{ $member['name'] }}
-                               
-                            </span>
-
-                            <span class="text-blue-600 font-semibold">
-                                {{ $member['paid'] }} DH
-                            </span>
-
-                        </div>
-
-                    @endforeach
-
-                </div>
-            </div>
+            
             <!-- Expenses List -->
             <div class="space-y-4">
 

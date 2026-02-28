@@ -32,8 +32,10 @@
 
         <!-- Cards -->
         <div class="grid md:grid-cols-2 gap-6">
+            
+            @if ($flatshares->count() > 0)
+                @foreach ($flatshares as $flatshare)
 
-            @foreach ($flatshares as $flatshare)
 
                     <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
 
@@ -46,9 +48,9 @@
                         </p>
 
                         <span class="inline-block px-3 py-1 text-sm rounded-full
-                                {{ $flatshare->status === 'active'
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700' }}">
+                                        {{ $flatshare->status === 'active'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700' }}">
                             {{ ucfirst($flatshare->status) }}
                         </span>
 
@@ -82,7 +84,14 @@
 
                     </div>
 
-            @endforeach
+                @endforeach
+            @else
+                <div class="w-full flex justify-center mt-5">
+                    <h1 class="text-2xl font-semibold text-gray-700">
+                        No flatshare now
+                    </h1>
+                </div>
+            @endif
 
         </div>
 

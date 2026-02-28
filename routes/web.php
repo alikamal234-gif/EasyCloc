@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/flatshare/create', [FlatshareController::class, 'create'])->name('flatshare.create');
     Route::get('/flatshare/edit/{id}', [FlatshareController::class, 'edit'])->name('flatshare.edit');
     Route::get('/flatshare/show/{id}', [FlatshareController::class, 'show'])->name('flatshare.show');
+    Route::put('/flatshare/{flatshareId}/exit', [FlatshareController::class, 'exit'])->name('flatshare.exit');
 
     Route::post('/flatshare/store', [FlatshareController::class, 'store'])->name('flatshare.store');
     Route::put('/flatshare/update/{id}', [FlatshareController::class, 'update'])->name('flatshare.update');

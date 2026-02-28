@@ -57,20 +57,19 @@ class InvitationController extends Controller
             ->wherePivotNull('left_at')
             ->exists();
 
-        if ($hasActiveFlatshare) {
-            return back()->with('error', 'You already belong to an active flatshare');
-        }
-
-        if ($invitation->status !== 'pending') {
-            return back()->with('error', 'This invitation is no longer valid');
-        }
-
+            if ($hasActiveFlatshare) {
+                return back()->with('error', 'You already belong to an active flatshare');
+                }
+                
+                if ($invitation->status !== 'pending') {
+                    return back()->with('error', 'This invitation is no longer valid');
+                    }
         DB::transaction(function () use ($invitation, $flatshare, $user) {
 
             $invitation->update([
                 'status' => 'accepted',
             ]);
-
+            $user->increment('reputation_score',1);
             $flatshare->users()->attach($user->id, [
                 'internal_role' => 'member',
                 'joined_at' => now(),
