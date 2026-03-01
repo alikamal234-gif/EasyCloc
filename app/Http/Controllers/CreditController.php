@@ -48,8 +48,7 @@ class CreditController extends Controller
                 ->where('debtor_id', $user->id)
                 ->sum('amount');
 
-           $balance = $paidExpenses - $share;
-
+           $balance = $paidExpenses - $share + $received - $given;
             $balances[] = [
                 'user' => $user,
                 'balance' => round($balance, 2),
