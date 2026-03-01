@@ -33,7 +33,7 @@ class CreditController extends Controller
         $share = $membersCount > 0 ? $total / $membersCount : 0;
 
         $balances = [];
-
+        
         foreach ($flatshare->users as $user) {
 
             $paidExpenses = $flatshare->expenses
@@ -48,7 +48,7 @@ class CreditController extends Controller
                 ->where('debtor_id', $user->id)
                 ->sum('amount');
 
-            $balance = $paidExpenses - $share + $received - $given;
+           $balance = $paidExpenses - $share;
 
             $balances[] = [
                 'user' => $user,
@@ -58,7 +58,6 @@ class CreditController extends Controller
 
         $creditors = collect($balances)->where('balance', '>', 0);
         $debtors = collect($balances)->where('balance', '<', 0);
-
         $settlements = [];
 
         foreach ($debtors as $debtor) {
@@ -81,11 +80,9 @@ class CreditController extends Controller
                     'to' => $creditor['user'],
                     'amount' => round($amount, 2),
                 ];
-
                 $remainingDebt -= $amount;
             }
         }
-
         return view('flatshare.credit', compact(
             'flatshare',
             'settlements',
