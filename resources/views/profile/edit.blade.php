@@ -1,57 +1,98 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+@section('title', 'Profile')
 
-            {{-- Reputation Section --}}
-            <div class="p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    Reputation Score
-                </h3>
+@section('content_header')
+    <h1>My Profile</h1>
+@stop
 
-                <div class="flex items-center justify-between">
-                    <span class="text-3xl font-bold
+@section('content')
+
+    <div class="row">
+
+        {{-- Reputation Card --}}
+        <div class="col-md-4">
+            <div class="card card-outline 
+                @if(auth()->user()->reputation_score >= 0)
+                    card-success
+                @else
+                    card-danger
+                @endif">
+
+                <div class="card-header">
+                    <h3 class="card-title">Reputation Score</h3>
+                </div>
+
+                <div class="card-body text-center">
+
+                    <h2 class="
                         @if(auth()->user()->reputation_score >= 0)
-                            text-green-600
+                            text-success
                         @else
-                            text-red-600
+                            text-danger
                         @endif
-                    ">
+                        font-weight-bold">
                         {{ auth()->user()->reputation_score }}
-                    </span>
+                    </h2>
 
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                    <small class="text-muted">
                         Based on flatshare activity
-                    </span>
+                    </small>
+
                 </div>
             </div>
+        </div>
 
-            {{-- Update Profile --}}
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+        {{-- Update Profile --}}
+        <div class="col-md-8">
+            <div class="card card-primary">
+
+                <div class="card-header">
+                    <h3 class="card-title">Update Profile Information</h3>
+                </div>
+
+                <div class="card-body">
                     @include('profile.partials.update-profile-information-form')
                 </div>
-            </div>
 
-            {{-- Update Password --}}
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row mt-4">
+
+        {{-- Update Password --}}
+        <div class="col-md-6">
+            <div class="card card-warning">
+
+                <div class="card-header">
+                    <h3 class="card-title">Change Password</h3>
+                </div>
+
+                <div class="card-body">
                     @include('profile.partials.update-password-form')
                 </div>
-            </div>
 
-            {{-- Delete Account --}}
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            </div>
+        </div>
+
+        {{-- Delete Account --}}
+        <div class="col-md-6">
+            <div class="card card-danger">
+
+                <div class="card-header">
+                    <h3 class="card-title">Delete Account</h3>
+                </div>
+
+                <div class="card-body">
                     @include('profile.partials.delete-user-form')
                 </div>
-            </div>
 
+            </div>
         </div>
+
     </div>
-</x-app-layout>
+
+@stop

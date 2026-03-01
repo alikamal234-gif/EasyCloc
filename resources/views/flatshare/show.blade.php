@@ -1,149 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $flatshare->name }} | EasyColoc</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('adminlte::page')
 
-<body class="bg-slate-50">
+@section('title', $flatshare->name)
 
-<div class="flex min-h-screen">
-
-    <!-- 🔷 SIDEBAR -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col">
-
-        <div class="p-6 border-b border-slate-700">
-            <h1 class="text-xl font-bold tracking-wide">
-                EasyColoc
-            </h1>
+@section('content_header')
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>{{ $flatshare->name }}</h1>
+            <small class="text-muted">
+                {{ $flatshare->description }}
+            </small>
         </div>
 
-        <nav class="flex-1 p-6 space-y-4 text-sm">
+        @php
+            $pivot = $flatshare->users
+                ->where('id', auth()->id())
+                ->first()
+                ->pivot ?? null;
+        @endphp
 
-            <a href="{{ route('dashboard') }}"
-               class="block hover:text-blue-400 transition">
-                Dashboard
-            </a>
-
-            <a href="{{ route('flatshare.index') }}"
-               class="block hover:text-blue-400 transition">
-                My Flatshares
-            </a>
-
-            <a href="{{ route('profile.edit') }}"
-               class="block hover:text-blue-400 transition">
-                Profile
-            </a>
-
-        </nav>
-
-        <div class="p-6 border-t border-slate-700">
-            <form action="{{ route('logout') }}" method="POST">
+        @if($pivot && $pivot->internal_role === 'owner')
+            <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
                 @csrf
-                <button class="text-red-400 hover:text-red-300 text-sm">
-                    Logout
+                @method('PUT')
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-times"></i> Cancel
                 </button>
             </form>
+        @else
+            <form action="{{ route('flatshare.exit', $flatshare->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Exit
+                </button>
+            </form>
+        @endif
+    </div>
+@stop
+
+
+@section('content')
+
+    {{-- STATUS BADGE --}}
+    <div class="mb-4">
+        <span class="badge {{ $flatshare->status === 'active' ? 'badge-success' : 'badge-danger' }}">
+            {{ ucfirst($flatshare->status) }}
+        </span>
+    </div>
+
+    {{-- MEMBERS --}}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Members</h3>
         </div>
 
-    </aside>
-
-
-    <!-- 🔹 MAIN CONTENT -->
-    <main class="flex-1 p-10">
-
-        <!-- Header Section -->
-        <div class="mb-10">
-
-            <div class="flex justify-between items-start">
-
-                <div>
-                    <h2 class="text-3xl font-bold text-slate-800">
-                        {{ $flatshare->name }}
-                    </h2>
-
-                    <p class="text-slate-500 mt-2">
-                        {{ $flatshare->description }}
-                    </p>
-
-                    <span class="inline-block mt-3 px-3 py-1 text-xs rounded-full
-                        {{ $flatshare->status === 'active'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-rose-100 text-rose-700' }}">
-                        {{ ucfirst($flatshare->status) }}
-                    </span>
-                </div>
-
-                <div class="flex gap-3">
-
-                    @php
-                        $pivot = $flatshare->users
-                            ->where('id', auth()->id())
-                            ->first()
-                            ->pivot ?? null;
-                    @endphp
-
-                    @if($pivot && $pivot->internal_role === 'owner')
-                        <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <button class="px-4 py-2 bg-rose-600 text-white rounded-md text-sm hover:bg-rose-700 transition">
-                                Cancel
-                            </button>
-                        </form>
-                    @else
-                        <form action="{{ route('flatshare.exit', $flatshare->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <button class="px-4 py-2 bg-rose-600 text-white rounded-md text-sm hover:bg-rose-700 transition">
-                                Exit
-                            </button>
-                        </form>
-                    @endif
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- MEMBERS GRID -->
-        <div class="mb-12">
-            <h3 class="text-lg font-semibold text-slate-700 mb-6">
-                Members
-            </h3>
-
-            <div class="grid md:grid-cols-3 gap-6">
+        <div class="card-body">
+            <div class="row">
 
                 @foreach($flatshare->users as $user)
                     @if($user->pivot->left_at == null)
 
-                        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                        <div class="col-md-4 mb-3">
 
-                            <p class="font-semibold text-slate-800">
-                                {{ $user->name }}
-                                @if($user->id === auth()->id())
-                                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full ml-2">
-                                        You
-                                    </span>
-                                @endif
-                            </p>
+                            <div class="border rounded p-3">
 
-                            <p class="text-xs text-slate-500 mt-2">
-                                {{ ucfirst($user->pivot->internal_role) }}
-                            </p>
+                                <strong>
+                                    {{ $user->name }}
+                                    @if($user->id === auth()->id())
+                                        <span class="badge badge-primary">You</span>
+                                    @endif
+                                </strong>
 
-                            <p class="text-sm mt-2 font-medium
-                                {{ $user->reputation_score < 0
-                                    ? 'text-rose-600'
-                                    : ($user->reputation_score > 0
-                                        ? 'text-emerald-600'
-                                        : 'text-slate-600') }}">
-                                Score: {{ $user->reputation_score }}
-                            </p>
+                                <div class="text-muted small">
+                                    {{ ucfirst($user->pivot->internal_role) }}
+                                </div>
+
+                                <div class="mt-2
+                                    @if($user->reputation_score < 0)
+                                        text-danger
+                                    @elseif($user->reputation_score > 0)
+                                        text-success
+                                    @endif">
+                                    Score: {{ $user->reputation_score }}
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -152,77 +93,81 @@
 
             </div>
         </div>
+    </div>
 
 
-        <!-- EXPENSES TABLE STYLE -->
-        <div>
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-semibold text-slate-700">
-                    Expenses
-                </h3>
+    {{-- EXPENSES --}}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Expenses</h3>
 
-                <div class="flex gap-3">
-                    <a href="{{ route('expense.create', $flatshare->id) }}"
-                       class="px-4 py-2 bg-emerald-600 text-white text-sm rounded-md hover:bg-emerald-700 transition">
-                        Add Expense
-                    </a>
+            <div>
+                <a href="{{ route('expense.create', $flatshare->id) }}"
+                   class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Add Expense
+                </a>
 
-                    <a href="{{ route('expense.credit', $flatshare->id) }}"
-                       class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition">
-                        Settlement
-                    </a>
-                </div>
+                <a href="{{ route('expense.credit', $flatshare->id) }}"
+                   class="btn btn-info btn-sm">
+                    <i class="fas fa-balance-scale"></i> Settlement
+                </a>
             </div>
+        </div>
+
+        <div class="card-body p-0">
 
             @php
                 $total = $flatshare->expenses->sum('amount');
             @endphp
 
-            <div class="mb-4 text-sm text-slate-600">
-                Total:
-                <span class="font-semibold text-indigo-600">
+            <div class="p-3 border-bottom">
+                <strong>Total:</strong>
+                <span class="text-primary font-weight-bold">
                     {{ $total }} DH
                 </span>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Paid By</th>
+                        <th>Date</th>
+                        <th class="text-right">Amount</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
 
                 @forelse($flatshare->expenses as $expense)
-
-                    <div class="flex justify-between items-center px-6 py-4 border-b last:border-none hover:bg-slate-50">
-
-                        <div>
-                            <p class="font-medium text-slate-800">
-                                {{ $expense->title }}
-                            </p>
-                            <p class="text-xs text-slate-500">
-                                {{ $expense->user->name }} • {{ $expense->date }}
-                            </p>
-                        </div>
-
-                        <div class="text-right">
-                            <p class="font-semibold text-slate-900">
-                                {{ $expense->amount }} DH
-                            </p>
-                            <p class="text-xs text-slate-500">
-                                {{ $expense->category->name ?? 'No Category' }}
-                            </p>
-                        </div>
-
-                    </div>
-
+                    <tr>
+                        <td>{{ $expense->title }}</td>
+                        <td>
+                            {{ $expense->user->name }}
+                            @if($expense->user->id === auth()->id())
+                                <span class="badge badge-success">You</span>
+                            @endif
+                        </td>
+                        <td>{{ $expense->date }}</td>
+                        <td class="text-right font-weight-bold">
+                            {{ $expense->amount }} DH
+                        </td>
+                        <td>
+                            {{ $expense->category->name ?? '—' }}
+                        </td>
+                    </tr>
                 @empty
-                    <div class="text-center py-10 text-slate-500 text-sm">
-                        No expenses yet.
-                    </div>
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No expenses yet.
+                        </td>
+                    </tr>
                 @endforelse
 
-            </div>
+                </tbody>
+            </table>
+
         </div>
+    </div>
 
-    </main>
-
-</div>
-
-</body>
-</html>
+@stop

@@ -1,102 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('adminlte::page')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flatshares</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@section('title', 'My Flatshares')
 
-<body class="bg-gray-100 min-h-screen">
+@section('content_header')
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>My Flatshares</h1>
 
-    <div class="max-w-5xl mx-auto py-10 px-4">
-
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">
-                My Flatshares
-            </h1>
-
-            @if($is_can)
-                <a href="{{ route('flatshare.create') }}"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
-                    + Create Flatshare
-                </a>
-            @else
-                <span class="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed opacity-60">
-                    + Create Flatshare
-                </span>
-            @endif
-        </div>
-
-        <!-- Cards -->
-        <div class="grid md:grid-cols-2 gap-6">
-            
-            @if ($flatshares->count() > 0)
-                @foreach ($flatshares as $flatshare)
+        @if($is_can)
+            <a href="{{ route('flatshare.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Flatshare
+            </a>
+        @else
+            <button class="btn btn-secondary" disabled>
+                <i class="fas fa-plus"></i> Create Flatshare
+            </button>
+        @endif
+    </div>
+@stop
 
 
-                    <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+@section('content')
 
-                        <h2 class="text-xl font-semibold text-gray-800 mb-2">
-                            {{ $flatshare->name }}
-                        </h2>
+    <div class="row">
 
-                        <p class="text-gray-600 mb-3">
-                            {{ $flatshare->description }}
-                        </p>
+        @if ($flatshares->count() > 0)
 
-                        <span class="inline-block px-3 py-1 text-sm rounded-full
-                                        {{ $flatshare->status === 'active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700' }}">
-                            {{ ucfirst($flatshare->status) }}
-                        </span>
+            @foreach ($flatshares as $flatshare)
 
-                        <!-- Actions -->
-                        <div class="flex items-center gap-4 mt-5">
+                <div class="col-md-6">
 
-                            <a href="{{ route('flatshare.show', $flatshare->id) }}"
-                                class="text-blue-600 hover:underline text-sm">
-                                View
-                            </a>
+                    <div class="card card-outline
+                        {{ $flatshare->status === 'active' ? 'card-success' : 'card-danger' }}">
 
-                            <a href="{{ route('flatshare.edit', $flatshare->id) }}"
-                                class="text-yellow-600 hover:underline text-sm">
-                                Edit
-                            </a>
-                            <a href="{{ route('flatshare.invite', $flatshare->id) }}"
-                                class="text-yellow-600 hover:underline text-sm">
-                                Invite
-                            </a>
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                {{ $flatshare->name }}
+                            </h3>
+
+                            <div class="card-tools">
+                                <span class="badge
+                                    {{ $flatshare->status === 'active'
+                                        ? 'badge-success'
+                                        : 'badge-danger' }}">
+                                    {{ ucfirst($flatshare->status) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="text-muted">
+                                {{ $flatshare->description }}
+                            </p>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between">
+
+                            <div>
+                                <a href="{{ route('flatshare.show', $flatshare->id) }}"
+                                   class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                              
+                                @if ($flatshare->pivot->internal_role == 'owner')
+                                    
+                                
+                                <a href="{{ route('flatshare.edit', $flatshare->id) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+
+                                <a href="{{ route('flatshare.invite', $flatshare->id) }}"
+                                   class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-user-plus"></i> Invite
+                                </a>
+                            </div>
 
                             <form action="{{ route('flatshare.cancel', $flatshare->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
 
-                                <button type="submit" class="text-red-600 hover:underline text-sm">
-                                    Cancel
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-times"></i> Cancel
                                 </button>
                             </form>
-
+                            @endif
                         </div>
 
                     </div>
 
-                @endforeach
-            @else
-                <div class="w-full flex justify-center mt-5">
-                    <h1 class="text-2xl font-semibold text-gray-700">
-                        No flatshare now
-                    </h1>
                 </div>
-            @endif
 
-        </div>
+            @endforeach
+
+        @else
+
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No flatshare available.
+                </div>
+            </div>
+
+        @endif
 
     </div>
 
-</body>
-
-</html>
+@stop

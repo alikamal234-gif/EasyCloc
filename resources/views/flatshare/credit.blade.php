@@ -1,104 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settlement</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('adminlte::page')
 
-<body class="bg-gray-100 min-h-screen">
+@section('title', 'Settlement')
 
-<div class="max-w-5xl mx-auto py-10 px-4">
+@section('content_header')
+    <h1>Settlement - {{ $flatshare->name }}</h1>
+@stop
 
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
-        <h1 class="text-2xl font-bold text-gray-800">
-            Settlement - {{ $flatshare->name }}
-        </h1>
-        <p class="text-gray-500 mt-1">
-            Overview of balances and payments {{ Auth()->user()->name }}
-        </p>
+
+@section('content')
+
+    {{-- 🔹 INFO BOXES --}}
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <span class="info-box-icon bg-primary">
+                    <i class="fas fa-coins"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Total Expenses</span>
+                    <span class="info-box-number">
+                        {{ number_format($total,2) }} DH
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <span class="info-box-icon bg-purple">
+                    <i class="fas fa-user-friends"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Share Per Member</span>
+                    <span class="info-box-number">
+                        {{ number_format($share,2) }} DH
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="info-box">
+                <span class="info-box-icon bg-secondary">
+                    <i class="fas fa-users"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Members</span>
+                    <span class="info-box-number">
+                        {{ $flatshare->users->count() }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="grid md:grid-cols-3 gap-6 mb-10">
 
-        <div class="bg-white p-6 rounded-xl shadow text-center">
-            <p class="text-sm text-gray-500">Total Expenses</p>
-            <p class="text-2xl font-bold text-blue-600 mt-2">
-                {{ number_format($total,2) }} DH
-            </p>
+    {{-- 🔹 SETTLEMENT TABLE --}}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Payment Overview</h3>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow text-center">
-            <p class="text-sm text-gray-500">Share Per Member</p>
-            <p class="text-2xl font-bold text-purple-600 mt-2">
-                {{ number_format($share,2) }} DH
-            </p>
-        </div>
+        <div class="card-body p-0">
 
-        <div class="bg-white p-6 rounded-xl shadow text-center">
-            <p class="text-sm text-gray-500">Members</p>
-            <p class="text-2xl font-bold text-gray-800 mt-2">
-                {{ $flatshare->users->count() }}
-            </p>
-        </div>
+            @if(count($settlements) === 0)
 
-    </div>
-
-    @if(count($settlements) === 0)
-
-        <div class="bg-white p-10 rounded-xl shadow text-center text-gray-500">
-            Everyone is settled 🎉
-        </div>
-
-    @else
-
-        <div class="bg-white rounded-xl shadow divide-y">
-
-            @foreach($settlements as $settlement)
-
-                <div class="p-6 flex justify-between items-center hover:bg-gray-50 transition">
-
-                    <div>
-                        <p class="text-gray-800 font-semibold text-lg">
-                            {{ $settlement['from']->name }}
-                            <span class="text-gray-400 mx-2">→</span>
-                            {{ $settlement['to']->name }}
-                        </p>
-
-                        <p class="text-sm text-gray-500 mt-1">
-                            Payment required
-                        </p>
-                    </div>
-
-                    <div class="text-red-600 font-bold text-xl">
-                        {{ number_format($settlement['amount'],2) }} DH
-                        @if ($settlement['to']->name == Auth()->user()->name)
-                            <form action="{{ route('payment.market') }}" method="POST">
-                               @csrf
-                               <input type="text" name="amount" id="" class="hidden" value="{{ $settlement['amount'] }}">
-                               <input type="text" name="debtor_id" id="" class="hidden" value="{{ Auth()->id() }}">
-                               <input type="text" name="creditor_id" id="" class="hidden" value="{{ $settlement['from']->id }}">
-                               <input type="text" name="flatshare_id" id="" class="hidden" value="{{ $flatshare->id }}">
-                               <button type="submit"
-                                   class="bg-green-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 shadow">
-                                   Mark as Paid
-                               </button>
-                           </form>
-                        @else
-                           <h5 class="text-black">is not paid</h5>
-                        @endif
-                    </div>
-
+                <div class="p-4 text-center text-success font-weight-bold">
+                    Everyone is settled 🎉
                 </div>
 
-            @endforeach
+            @else
+
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th class="text-right">Amount</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach($settlements as $settlement)
+
+                            <tr>
+
+                                <td>
+                                    <strong>{{ $settlement['from']->name }}</strong>
+                                </td>
+
+                                <td>
+                                    <strong>{{ $settlement['to']->name }}</strong>
+                                </td>
+
+                                <td class="text-right text-danger font-weight-bold">
+                                    {{ number_format($settlement['amount'],2) }} DH
+                                </td>
+
+                                <td class="text-center">
+
+                                    @if ($settlement['to']->id == Auth()->id())
+
+                                        <form action="{{ route('payment.market') }}" method="POST">
+                                            @csrf
+
+                                            <input type="hidden" name="amount"
+                                                   value="{{ $settlement['amount'] }}">
+
+                                            <input type="hidden" name="debtor_id"
+                                                   value="{{ Auth()->id() }}">
+
+                                            <input type="hidden" name="creditor_id"
+                                                   value="{{ $settlement['from']->id }}">
+
+                                            <input type="hidden" name="flatshare_id"
+                                                   value="{{ $flatshare->id }}">
+
+                                            <button type="submit"
+                                                class="btn btn-success btn-sm">
+                                                <i class="fas fa-check"></i> Mark as Paid
+                                            </button>
+                                        </form>
+
+                                    @else
+                                        <span class="badge badge-warning">
+                                            Pending
+                                        </span>
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+                </table>
+
+            @endif
 
         </div>
+    </div>
 
-    @endif
-
-</div>
-
-</body>
-</html>
+@stop

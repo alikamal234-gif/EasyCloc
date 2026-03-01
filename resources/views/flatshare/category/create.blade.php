@@ -1,69 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Category</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('adminlte::page')
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+@section('title', 'Create Category')
 
-    <div class="w-full max-w-md">
+@section('content_header')
+    <h1>Create New Category</h1>
+@stop
 
-        <!-- Card -->
-        <div class="bg-white rounded-2xl shadow-lg p-8">
+@section('content')
 
-            <!-- Title -->
-            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-                Create New Category
-            </h1>
+    <div class="row justify-content-center">
+        <div class="col-md-5">
 
-            <!-- Form -->
-            <form action="{{ route('category.store',$flatshareId) }}" method="POST" class="space-y-5">
-                @csrf
+            <div class="card card-info">
 
-                <!-- Category Name -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-2">
-                        Category Name
-                    </label>
-
-                    <input type="text" name="name"
-                        value="{{ old('name') }}"
-                        placeholder="e.g. Groceries"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                  
-                    @error('success')
-                        <p class="text-green-500 text-sm mt-1">
-                            {{ $message }}
-                        </p>
-                    @enderror
+                <div class="card-header">
+                    <h3 class="card-title">Add Category</h3>
                 </div>
 
-                <!-- Hidden flatshare -->
-                <input type="hidden" name="flatshare_id" value="{{ $flatshareId ?? '' }}">
+                <form action="{{ route('category.store', $flatshareId) }}" method="POST">
+                    @csrf
 
-                <!-- Buttons -->
-                <div class="flex justify-between items-center pt-4">
+                    <div class="card-body">
 
-                    <a href="{{ url()->previous() }}"
-                        class="text-gray-500 hover:underline text-sm">
-                        Cancel
-                    </a>
+                        {{-- Category Name --}}
+                        <div class="form-group">
+                            <label>Category Name</label>
+                            <input type="text"
+                                   name="name"
+                                   value="{{ old('name') }}"
+                                   placeholder="e.g. Groceries"
+                                   class="form-control"
+                                   required>
 
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition duration-200 shadow">
-                        Save Category
-                    </button>
+                            @error('name')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
 
-                </div>
+                            @if(session('success'))
+                                <small class="text-success">
+                                    {{ session('success') }}
+                                </small>
+                            @endif
+                        </div>
 
-            </form>
+                        {{-- Hidden flatshare --}}
+                        <input type="hidden" name="flatshare_id" value="{{ $flatshareId }}">
+
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between">
+
+                        <a href="{{ url()->previous() }}"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-info">
+                            <i class="fas fa-save"></i> Save Category
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
-
     </div>
 
-</body>
-</html>
+@stop
