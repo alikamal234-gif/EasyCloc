@@ -32,7 +32,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/flatshare/store', [FlatshareController::class, 'store'])->name('flatshare.store');
     Route::put('/flatshare/update/{id}', [FlatshareController::class, 'update'])->name('flatshare.update');
-    // Route::delete('/flatshare/destroy/{id}', [FlatshareController::class, 'destroy'])->name('flatshare.destroy');
     Route::put('/flatshare/{id}/cancel',[FlatshareController::class, 'cancel'])->name('flatshare.cancel');
 
     // expense
