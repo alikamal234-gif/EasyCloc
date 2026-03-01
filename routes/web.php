@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\StatistiqueController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ExpenseController;
@@ -12,11 +14,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -59,4 +58,20 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [StatistiqueController::class, 'index'])
+        ->name('admin.statistics');
+
+    Route::get('/users',[AdminUserController::class,'index'])
+        ->name('admin.users');
+
+    Route::put('/users/ban/{id}',[AdminUserController::class,'ban'])
+        ->name('admin.users.ban');
+
+    Route::put('/users/unban/{id}',[AdminUserController::class,'unban'])
+        ->name('admin.users.unban');
+
+    Route::delete('/users/{id}',[AdminUserController::class,'destroy'])
+        ->name('admin.users.delete');
+});
 require __DIR__.'/auth.php';
