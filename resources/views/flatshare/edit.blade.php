@@ -23,7 +23,6 @@
 
                     <div class="card-body">
 
-                        {{-- Name --}}
                         <div class="form-group">
                             <label>Name</label>
                             <input type="text"
@@ -37,7 +36,6 @@
                             @enderror
                         </div>
 
-                        {{-- Description --}}
                         <div class="form-group">
                             <label>Description</label>
                             <textarea name="description"

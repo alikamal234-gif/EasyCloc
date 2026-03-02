@@ -52,7 +52,6 @@
                             </div>
                         </div>
 
-                        {{-- Body --}}
                         <div class="card-body">
                             @if($flatshare->description)
                                 <p class="text-muted mb-0">
@@ -64,14 +63,12 @@
                                 </p>
                             @endif
 
-                            {{-- Member count --}}
                             <div class="mt-3 small text-muted">
                                 <i class="fas fa-users mr-1"></i>
                                 {{ $flatshare->users->count() }} 
                                 {{ $flatshare->users->count() == 1 ? 'member' : 'members' }}
                             </div>
 
-                            {{-- Cancelled date if cancelled --}}
                             @if($flatshare->status === 'cancelled' && $flatshare->updated_at)
                                 <div class="mt-2 small text-danger">
                                     <i class="fas fa-clock mr-1"></i>
@@ -80,9 +77,7 @@
                             @endif
                         </div>
 
-                        {{-- Footer --}}
                         <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                            {{-- View button for all --}}
                             <div class="btn-group">
                                 <a href="{{ route('flatshare.show', $flatshare->id) }}"
                                    class="btn btn-sm 
@@ -94,7 +89,6 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
 
-                                {{-- Edit and Invite only for active flatshares AND owner --}}
                                 @if($flatshare->status === 'active' && $flatshare->pivot->internal_role == 'owner')
                                     <a href="{{ route('flatshare.edit', $flatshare->id) }}"
                                        class="btn btn-sm btn-warning"
@@ -112,7 +106,6 @@
                                 @endif
                             </div>
 
-                            {{-- Cancel button only for active flatshares and owner --}}
                             @if($flatshare->status === 'active' && $flatshare->pivot->internal_role == 'owner')
                                 <form action="{{ route('flatshare.cancel', $flatshare->id) }}" 
                                       method="POST" 

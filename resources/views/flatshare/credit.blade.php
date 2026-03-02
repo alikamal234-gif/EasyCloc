@@ -9,7 +9,6 @@
 
 @section('content')
 
-    {{-- 🔹 INFO BOXES --}}
     <div class="row mb-4">
 
         <div class="col-md-4">
@@ -57,7 +56,6 @@
     </div>
 
 
-    {{-- 🔹 SETTLEMENT TABLE --}}
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Payment Overview</h3>
