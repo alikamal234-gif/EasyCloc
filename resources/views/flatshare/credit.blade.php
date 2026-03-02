@@ -68,7 +68,7 @@
             @if(count($settlements) === 0)
 
                 <div class="p-4 text-center text-success font-weight-bold">
-                    Everyone is settled 🎉
+                    Everyone is settled 
                 </div>
 
             @else

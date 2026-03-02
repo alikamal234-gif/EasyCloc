@@ -105,6 +105,9 @@
             <a href="{{ route('expense.create', $flatshare->id) }}" class="btn btn-success btn-sm">
                 <i class="fas fa-plus"></i> Add Expense
             </a>
+            <a href="{{ route('category.create', $flatshare->id) }}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i> Add Category
+            </a>
 
             <a href="{{ route('expense.credit', $flatshare->id) }}" class="btn btn-info btn-sm">
                 <i class="fas fa-balance-scale"></i> Settlement
