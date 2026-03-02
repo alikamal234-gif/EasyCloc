@@ -14,7 +14,6 @@ class StatistiqueController extends Controller
 {
     public function index()
     {
-        // === GLOBAL COUNTS ===
         $totalUsers       = User::count();
         $bannedUsers      = User::where('is_banned', 1)->count();
         $activeUsers      = User::where('is_banned', 0)->count();
