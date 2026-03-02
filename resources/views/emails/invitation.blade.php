@@ -1,3 +1,3 @@
 <a href="{{ route('flatshare.process',$token) }}">
-    {{ $token }}
+    link invitation
 </a>

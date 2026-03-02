@@ -113,8 +113,8 @@ class FlatshareController extends Controller
         ) {
             abort(403);
         }
-
-        if ($flatshare->users()->count() > 1) {
+        
+        if ($flatshare->users()->wherePivotNotNull('left_at')->count() > 1) {
             return abort(404);
         }
         $flatshare->update([
